@@ -14,6 +14,7 @@ export default function Dashboard() {
 
     // Check for authentication 
     const fetchUserDetail = async () =>{
+        
         try {
            await http.post('/me').then((res)=>{
                 setUserdetail(res.data);

@@ -28,18 +28,12 @@ class ProductController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function productCategoryStore(Request $request){
-        // print_r($request->all());
-        // $this->validate($request, [
-        //     'category_name' => 'required',
-        //     'cat_image' => 'required',
-        // ]);
-        $imagesName = [];
-        $response = [];
-
+    
+        $input = $request->input();
         $validator = Validator::make($request->all(),
             [
                 'category_name' => 'required',
-                'cat_image.*' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:20048'
+                'file' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:20048'
             ]
         );
 
@@ -47,36 +41,38 @@ class ProductController extends Controller
             return response()->json(["status" => "failed", "message" => "Validation error", "errors" => $validator->errors()]);
         }
 
-        if($request->has('cat_image')) {
-            foreach($request->file('cat_image') as $image) {
-                $filename = time().rand(3). '.'.$image->getClientOriginalExtension();
-                // print $filename;
-                $image->move('uploads/', $filename);
-
-                // Image::create([
-                //     'image_name' => $filename
-                // ]);
-            }
-
+        if($request->has('file')) {
+            $filenameWithExt = $request->file("file")->getClientOriginalName();
+            $filename= pathinfo($filenameWithExt,PATHINFO_FILENAME);
+            $extension = $request->file("file")->getClientOriginalExtension();
+            $fileNameToStore = $filename."_".time().".".$extension;
+            $input['cat_image'] = $fileNameToStore;
+            $request->file->move(public_path('/uploads'), $fileNameToStore);
             $response["status"] = "successs";
             $response["message"] = "Success! image(s) uploaded";
         }
-
         else {
             $response["status"] = "failed";
             $response["message"] = "Failed! image(s) not uploaded";
         }
+        DB::table('product_category')->insert($input);
         return response()->json($response);
-    
+        
+    }
     
        
-
-        // return response()->json(['message' => 'This is a test'], 200);
-        // if($request->all()){
-        //     DB::table('product_category')->insert($request->all());
-        //     return response()->json(['message' => 'Success'], 201);
-        // }else{
-        //     return response()->json(['error' => 'Unauthorized'], 401);
+        // if($request->hasFile("file")){
+        //     $filenameWithExt = $request->file("file")->getClientOriginalName();
+        //     $filename= pathinfo($filenameWithExt,PATHINFO_FILENAME);
+        //     $extension = $request->file("file")->getClientOriginalExtension();
+        //     $fileNameToStore = $filename."_".time().".".$extension;
+        //     $path= $request->file("file")->storeAs("public/images",$fileNameToStore);
         // }
-    }
+        // else{
+        //     $fileNameToStore = "no-image.svg";
+        //     $path="public/images/no-image.svg";
+        // };
+       
+
+    // }
 }

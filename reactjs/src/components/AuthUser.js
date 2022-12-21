@@ -13,11 +13,13 @@ export default function AuthUser(){
         return userToken;
     }
 
-    const getUser = () =>{
-      
+    const getUser = async () =>{      
         const userString = localStorage.getItem('user');
         const user_detail = JSON.parse(userString);
         return user_detail;
+        // checkLogin(user_detail)
+
+        
     }
 
     const [token,setToken] = useState(getToken());
@@ -42,17 +44,31 @@ export default function AuthUser(){
         baseURL:`${process.env.REACT_APP_BASEURL_BACKEND}`,
         headers:{            
             "Content-type" : "application/json",
-            'Content-Type': 'multipart/form-data',
-            "Authorization" : `Bearer ${token}`
+            'Content-Type': "multipart/form-data",
+            "Authorization" : `Bearer ${token}`,
+            "Accept": "application/json",
         },
         
     });
+
+    const loginStatus = async ()=>{
+        const userString = localStorage.getItem('user');
+        const user_detail = JSON.parse(userString);        
+        try {
+            await http.get('/me').then((res)=>{
+                return user_detail;
+             }); 
+         } catch (error) {
+             logout();
+         }  
+    }
     return {
         setToken:saveToken,
         token,
         user,
         getToken,
         http,
-        logout
+        logout,
+        loginStatus
     }
 }

@@ -35,7 +35,7 @@ export const CategoryModal = () => {
     const formData = new FormData()
 
     formData.append('category_name', data.category_name)
-    formData.append('cat_image', data.cat_image)
+    formData.append('file', data.cat_image)
     // console.log(data)
     //   data.append('cat_image', data.cat_image);
     try {

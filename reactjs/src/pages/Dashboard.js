@@ -1,4 +1,6 @@
+
 export const Dashboard = () => {
+   
   return (
     <>
      <h1 className="h3 mb-3"><strong>Analytics</strong> Dashboard</h1>
