@@ -9,7 +9,8 @@ export default function LoginComponent() {
     const submitForm = () =>{
         // api call
         http.post('/login',{email:email,password:password}).then((res)=>{
-            setToken(res.data.user,res.data.access_token);
+            // console.log(res)
+             setToken(res.data.user,res.data.access_token);
         })
     }
 

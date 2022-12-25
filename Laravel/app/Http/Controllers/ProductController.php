@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
+
 class ProductController extends Controller
 {
     /**
@@ -19,8 +20,6 @@ class ProductController extends Controller
     {
         $this->middleware('auth:api');
     }
-
-
 
     /**
      * Insert the Project data.
@@ -58,6 +57,18 @@ class ProductController extends Controller
         DB::table('product_category')->insert($input);
         return response()->json($response);
         
+    }
+
+
+    function productCategory(Request $request){
+         $request->get('search');
+         $productCategory = DB::table('product_category')->paginate(10);
+        // $response = Response::json($productCategory);
+        // return $response;
+        // return Response::json($productCategory,200);
+      return response()->json($productCategory);
+        //   return $productCategory->toJson();
+        // return response($productCategory, 200);
     }
     
        

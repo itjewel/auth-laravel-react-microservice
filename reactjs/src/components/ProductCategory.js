@@ -1,50 +1,46 @@
 
 import React, {useState, useEffect} from 'react'
-import { Link, useParams} from 'react-router-dom';
+import { Link, useParams, useSearchParams} from 'react-router-dom';
 import AuthUser from '../components/AuthUser';
 import { CategoryModal } from './CategoryModal';
 import { AiFillEdit,AiFillDelete } from "react-icons/ai";
+ import Pagination from './Pagination';
 const ProductCategory = () => {
+    const backendUrl = `${process.env.REACT_APP_BASEURL_BACKEND_BASE}`;
     const { id } = useParams();
+    const [searchParams] = useSearchParams()
     const {http} = AuthUser();
-    const [projects, setProject] = useState([]);
-    const [users, setUsers] = useState([]);
-    const [assign, setAssign] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [categoriesPagination, setCategoriesPagination] = useState([]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [perPage, setPerPage] = useState(0);
+    const [totalPage, setTotalPage] = useState(0);
   
-    const getprojectInformation = async (id) => {  
-      try {
-        // get individual Project
-          const response = await http.get(`/getprojectInfo/${id}`); 
-          setProject(response.data);
-  
-          // get User list
-          const users = await http.get(`/get-users`); 
-          setUsers(users.data);
-  
-          // get assign project list
-          const assignRes = await http.get(`/get-assign/${id}`); 
-          setAssign(assignRes.data);
-          
+    const getCategoryInfo = async (id) => {  
+        let urlparam = searchParams.get('page');
+        //  console.log(urlparam)
+      try {  
+          // get Product Category list
+          const productCategory = await http.get(`/product-category?page=${urlparam?urlparam: currentPage}&search=jewel`); 
+          const {data,current_page,per_page } = productCategory.data
+        //   console.log(productCategory.data)
+          setCategories(data);        
+          setCategoriesPagination(productCategory.data);        
+          setCurrentPage(current_page);        
+          setPerPage(per_page);        
+          setTotalPage(per_page);        
+        //   console.log(productCategory.data)  
       } catch (error) {
           console.log(error)
       }
     }
   
     useEffect(()=>{  
-      getprojectInformation(id);
-    },[id])
+        getCategoryInfo();
+    },[currentPage])
   
-    // This method for assign 
-    let assignHandeler = async (event) =>{
-      const userId = event.target.value;
-      const data = {'userId': userId, 'projectId':id};
-      if (event.target.checked) {
-        // user assign project
-        await http.post('/assign-task',data);
-      } else {
-        // user unassign project
-        await http.post('/unassign-task',data);
-      }
+    const pageNumber = (id)=>{
+        setCurrentPage(id);
     }
   
     return (
@@ -52,8 +48,16 @@ const ProductCategory = () => {
            
         <div className="card">
             <div className="card-header">
-                <CategoryModal/>
-          
+            <nav className="navbar navbar-light bg-light">
+                <div className="container-fluid">
+                    <CategoryModal/>
+                    <form className="d-flex">
+                    <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
+                    <button className="btn btn-outline-success" type="submit">Search</button>
+                    </form>
+                </div>
+                </nav>
+               
                 
             </div>
             <table className="table table-striped">
@@ -65,29 +69,24 @@ const ProductCategory = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Vanessa Tucker</td>
-                        <td>
-                            <img width='120' src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"/>
-                        </td>
-                        <td className="table-action">
-                            <a href="#"><i className="align-middle" data-feather="edit-2"></i></a>
-                            <a href="#"><i className="align-middle" data-feather="trash"></i></a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>William Harris</td>
-                        <td>
-                        <img width='120' src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"/>
-                        </td>
-                        <td className="table-action">
-                            <a><AiFillEdit/></a>
-                            <a><AiFillDelete /></a>
-                        </td>
-                    </tr>
-                   
+                {categories && categories.map((value )=> (
+                    <tr key={value.id}>
+                    <td>{value.category_name}</td>
+                    <td>
+                        <img width={120} src={backendUrl+'uploads/'+value.cat_image}/>
+                    </td>
+                    <td className="table-action">
+                        <a><AiFillEdit/></a>
+                        <a><AiFillDelete /></a>
+                    </td>
+                </tr>
+                ))}
+               
                 </tbody>
+                
             </table>
+           <Pagination links={categoriesPagination.links} method={pageNumber}/>
+          
         </div>
     </div>
     )

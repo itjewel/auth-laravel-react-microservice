@@ -42,5 +42,5 @@ Route::group(['middleware'=>'api'],function(){
     
     // Product module
     Route::post('add-product-category', [ProductController::class,'productCategoryStore']);
-    // Route::get('add-product-category', [ProductController::class,'productCategoryStore']);
+    Route::get('product-category/{id?}', [ProductController::class,'productCategory']);
 });
