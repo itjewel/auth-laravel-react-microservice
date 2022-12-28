@@ -61,7 +61,7 @@ class ProductController extends Controller
 
 
     function productCategory(Request $request){
-         $request->get('search');
+        print $request->get('search');
          $productCategory = DB::table('product_category')->paginate(10);
         // $response = Response::json($productCategory);
         // return $response;

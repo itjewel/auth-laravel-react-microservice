@@ -42,6 +42,11 @@ const ProductCategory = () => {
     const pageNumber = (id)=>{
         setCurrentPage(id);
     }
+    const testPurpose = async ()=>{
+        let urlparam = searchParams.get('page');
+        const productCategory = await http.get(`/product-category?page=${urlparam?urlparam: currentPage}&search=kamal`); 
+        console.log(productCategory)
+    }
   
     return (
         <div className="col-12 col-xl-12">
@@ -51,9 +56,9 @@ const ProductCategory = () => {
             <nav className="navbar navbar-light bg-light">
                 <div className="container-fluid">
                     <CategoryModal/>
-                    <form className="d-flex">
-                    <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-                    <button className="btn btn-outline-success" type="submit">Search</button>
+                    <form className="d-flex" method="get">
+                    <input className="form-control me-2" type="search" name="search" placeholder="Search" aria-label="Search" />
+                    <button className="btn btn-outline-success" type="submit" onClick={testPurpose}>Search</button>
                     </form>
                 </div>
                 </nav>
